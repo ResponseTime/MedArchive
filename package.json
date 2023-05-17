@@ -1,0 +1,22 @@
+{
+  "name": "med_archive",
+  "version": "1.0.0",
+  "description": "This app keeps all the medical record of a patient in one place",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ResponseTime/MedArchive.git"
+  },
+  "keywords": [
+    "medarchive"
+  ],
+  "author": "ResponseTime",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ResponseTime/MedArchive/issues"
+  },
+  "homepage": "https://github.com/ResponseTime/MedArchive#readme"
+}
