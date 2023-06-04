@@ -2,12 +2,23 @@ const express = require("express");
 const path = require("path");
 const app = express();
 const db = require("./server.js");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("views", path.join(__dirname, "/views"));
 app.set("view engine", "ejs");
+app.use(cookieParser());
+app.use(
+  session({
+    secret: process.env.SECRET_KEY,
+    saveUninitialized: true,
+    resave: true,
+  })
+);
 const port = 5000;
+
 app.get("/login", (req, res) => {
   res.render("login");
 });
@@ -18,6 +29,8 @@ app.post("/login", async (req, res) => {
   let coll = await c.find();
   for await (let col of coll) {
     if (col.username === user && col.password === pass) {
+      req.session.user = user;
+      req.session.save();
       res.render("main");
     } else {
       res.send("Invalid Login");
