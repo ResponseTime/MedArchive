@@ -10,6 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 app.set("views", path.join(__dirname, "/views"));
 app.set("view engine", "ejs");
 app.use(cookieParser());
+
 app.use(
   session({
     secret: process.env.SECRET_KEY,
@@ -19,10 +20,14 @@ app.use(
 );
 const port = 5000;
 
-app.get("/login", (req, res) => {
-  res.render("login");
+app.get("/MedArchive/login", (req, res) => {
+  res.render("login", { error: "" });
 });
-app.post("/login", async (req, res) => {
+
+app.get("/MedArchive/signup", (req, res) => {
+  res.render("signup", { error: "" });
+});
+app.post("/MedArchive/api/login", async (req, res) => {
   let user = req.body.username;
   let pass = req.body.password;
   let c = await db.collection("login");
@@ -31,16 +36,11 @@ app.post("/login", async (req, res) => {
     if (col.username === user && col.password === pass) {
       req.session.user = user;
       req.session.save();
-      res.render("main");
-    } else {
-      res.send("Invalid Login");
+      res.render("main", { name: req.session.user });
     }
   }
 });
-app.get("/signup", (req, res) => {
-  res.render("signup", { error: "" });
-});
-app.post("/signup", async (req, res) => {
+app.post("/MedArchive/api/signup", async (req, res) => {
   let user = req.body.user;
   let pass = req.body.pass;
   let c = await db.collection("login");
@@ -60,6 +60,11 @@ app.post("/signup", async (req, res) => {
     }
   }
 });
+app.get("/MedArchive/logout", (req, res) => {
+  req.session.destroy();
+  res.send("Done");
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

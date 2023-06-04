@@ -7,10 +7,11 @@
     <title>Login</title>
 </head>
 <body>
-    <form action="/login" method="post" enctype="multipart/form">
+    <form action="/MedArchive/api/login" method="post" enctype="multipart/form">
         <input type="text" name="username" placeholder="Username">
         <input type="password" name="password" placeholder="Password">
         <input type="submit" value="Login">
     </form>
+    <h1><%= error%></h1>
 </body>
 </html>
