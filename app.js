@@ -27,7 +27,7 @@ app.get("/MedArchive/login", (req, res) => {
 app.get("/MedArchive/signup", (req, res) => {
   res.render("signup", { error: "" });
 });
-let authenticate = async (req) => {
+let authenticate_login = async (req) => {
   let user = req.body.username;
   let pass = req.body.password;
   let c = await db.collection("login");
@@ -39,8 +39,20 @@ let authenticate = async (req) => {
   }
   return false;
 };
+let authenticate_signup = async (req) => {
+  let user = req.body.user;
+  let pass = req.body.pass;
+  let c = await db.collection("login");
+  let coll = await c.find();
+  for await (let col of coll) {
+    if (col.username === user && col.Name == req.body.Name) {
+      return true;
+    }
+  }
+  return false;
+};
 app.post("/MedArchive/api/login", async (req, res) => {
-  let com = await authenticate(req);
+  let com = await authenticate_login(req);
   if (com) {
     req.session.user = req.body.username;
     req.session.save();
@@ -50,7 +62,7 @@ app.post("/MedArchive/api/login", async (req, res) => {
   }
 });
 app.post("/MedArchive/api/signup", async (req, res) => {
-  let com = await authenticate(req);
+  let com = await authenticate_signup(req);
   let c = await db.collection("login");
   if (com) {
     res.render("signup", { error: "user already exists or username taken" });
