@@ -27,17 +27,26 @@ app.get("/MedArchive/login", (req, res) => {
 app.get("/MedArchive/signup", (req, res) => {
   res.render("signup", { error: "" });
 });
-app.post("/MedArchive/api/login", async (req, res) => {
+let authenticate = async (req) => {
   let user = req.body.username;
   let pass = req.body.password;
   let c = await db.collection("login");
   let coll = await c.find();
   for await (let col of coll) {
     if (col.username === user && col.password === pass) {
-      req.session.user = user;
-      req.session.save();
-      res.render("main", { name: req.session.user });
+      return true;
     }
+  }
+  return false;
+};
+app.post("/MedArchive/api/login", async (req, res) => {
+  let com = await authenticate(req);
+  if (com == true) {
+    req.session.user = req.body.username;
+    req.session.save();
+    res.render("main", { name: req.session.user });
+  } else {
+    res.send("Invalid login");
   }
 });
 app.post("/MedArchive/api/signup", async (req, res) => {
