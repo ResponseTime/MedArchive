@@ -41,32 +41,28 @@ let authenticate = async (req) => {
 };
 app.post("/MedArchive/api/login", async (req, res) => {
   let com = await authenticate(req);
-  if (com == true) {
+  if (com) {
     req.session.user = req.body.username;
     req.session.save();
     res.render("main", { name: req.session.user });
   } else {
-    res.send("Invalid login");
+    res.render("login", { error: "Invalid Login" });
   }
 });
 app.post("/MedArchive/api/signup", async (req, res) => {
-  let user = req.body.user;
-  let pass = req.body.pass;
+  let com = await authenticate(req);
   let c = await db.collection("login");
-  let coll = await c.find();
-  for await (let col of coll) {
-    if (col.username === user || col.Name === req.body.Name) {
-      res.render("signup", { error: "user already exists or username taken" });
-    } else {
-      c.insertOne({
-        Name: req.body.Name,
-        Age: req.body.Age,
-        Email: req.body.Email,
-        username: user,
-        password: pass,
-      });
-      res.send("Done");
-    }
+  if (com) {
+    res.render("signup", { error: "user already exists or username taken" });
+  } else {
+    c.insertOne({
+      Name: req.body.Name,
+      Age: req.body.Age,
+      Email: req.body.Email,
+      username: req.body.user,
+      password: req.body.pass,
+    });
+    res.send("Done");
   }
 });
 app.get("/MedArchive/logout", (req, res) => {
