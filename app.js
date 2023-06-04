@@ -5,23 +5,48 @@ const db = require("./server.js");
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.set("views", path.join(__dirname, "/views"));
+app.set("view engine", "ejs");
 const port = 5000;
-app.get("/insert/:name/:reason", async (req, res) => {
-  let cols = await db.listCollections().toArray();
-  cols = cols.map((x) => x.name);
-  console.log(cols);
-  if (cols.includes("bane")) {
-    await db
-      .collection("bane")
-      .insertOne({ name: req.params.name, reason: req.params.reason });
-  } else {
-    await db.createCollection("bane");
-    await db
-      .collection("bane")
-      .insertOne({ name: req.params.name, reason: req.params.reason });
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+app.post("/login", async (req, res) => {
+  let user = req.body.username;
+  let pass = req.body.password;
+  let c = await db.collection("login");
+  let coll = await c.find();
+  for await (let col of coll) {
+    if (col.username === user && col.password === pass) {
+      res.render("main");
+    } else {
+      res.send("Invalid Login");
+    }
   }
-  res.send("Hello World!");
+});
+app.get("/signup", (req, res) => {
+  res.render("signup", { error: "" });
+});
+app.post("/signup", async (req, res) => {
+  let user = req.body.user;
+  let pass = req.body.pass;
+  let c = await db.collection("login");
+  let coll = await c.find();
+  for await (let col of coll) {
+    if (col.username === user || col.Name === req.body.Name) {
+      res.render("signup", { error: "user already exists or username taken" });
+    } else {
+      c.insertOne({
+        Name: req.body.Name,
+        Age: req.body.Age,
+        Email: req.body.Email,
+        username: user,
+        password: pass,
+      });
+      res.send("Done");
+    }
+  }
 });
 app.listen(port, () => {
-  console.log(`listening on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });
