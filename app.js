@@ -19,7 +19,13 @@ app.use(
   })
 );
 const port = 5000;
-
+app.get("/MedArchive/home", (req, res) => {
+  if (req.session.user) {
+    res.render("main", { name: req.session.user });
+  } else {
+    res.render("main", { name: "Not logined yet" });
+  }
+});
 app.get("/MedArchive/login", (req, res) => {
   res.render("login", { error: "" });
 });
@@ -45,7 +51,11 @@ let authenticate_signup = async (req) => {
   let c = await db.collection("login");
   let coll = await c.find();
   for await (let col of coll) {
-    if (col.username === user && col.Name == req.body.Name) {
+    if (
+      col.username === user ||
+      col.Name === req.body.Name ||
+      col.Email === req.body.Email
+    ) {
       return true;
     }
   }
